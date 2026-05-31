@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Management System</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#eef2ff;
+}
+
+/* PAGE */
+
+.page{
+    display:none;
+    min-height:100vh;
+    padding:20px;
+}
+
+.active{
+    display:block;
+}
+
+/* NAVBAR */
+
+nav{
+    background:#1e293b;
+    color:white;
+    padding:15px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+
+nav h2{
+    font-size:28px;
+}
+
+nav ul{
+    display:flex;
+    gap:20px;
+    list-style:none;
+    align-items:center;
+}
+
+nav ul li{
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* LOGIN */
+
+.auth-box{
+    width:100%;
+    max-width:420px;
+    background:white;
+    margin:70px auto;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.auth-box h2{
+    text-align:center;
+    margin-bottom:25px;
+    color:#1e3a8a;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    margin:12px 0;
+    border:1px solid #ccc;
+    border-radius:10px;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.link{
+    text-align:center;
+    margin-top:15px;
+    color:blue;
+    cursor:pointer;
+}
+
+/* DASHBOARD */
+
+.content{
+    padding:30px;
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-top:30px;
+}
+
+.card{
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    color:#1e3a8a;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:30px;
+    font-weight:bold;
+}
+
+/* FORM */
+
+.form-container{
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    margin-top:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* FILTER */
+
+.filter-box{
+    margin-top:20px;
+}
+
+#searchInput{
+    width:300px;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+    background:white;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+table th{
+    background:#1e3a8a;
+    color:white;
+    padding:15px;
+}
+
+table td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #ddd;
+}
+
+/* BUTTONS */
+
+.edit-btn{
+    background:orange;
+    width:auto;
+    padding:8px 12px;
+}
+
+.delete-btn{
+    background:red;
+    width:auto;
+    padding:8px 12px;
+}
+
+.logout-btn{
+    background:red;
+    width:auto;
+    padding:10px 15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+
+<section id="loginPage" class="page active">
+
+<div class="auth-box">
+
+<h2>Login</h2>
+
+<input type="text" id="loginUsername" placeholder="Username">
+
+<input type="password" id="loginPassword" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<div class="link" onclick="showPage('registerPage')">
+New User? Sign Up
+</div>
+
+</div>
+
+</section>
+
+<!-- REGISTER PAGE -->
+
+<section id="registerPage" class="page">
+
+<div class="auth-box">
+
+<h2>Register</h2>
+
+<input type="text" id="registerUsername" placeholder="Username">
+
+<input type="password" id="registerPassword" placeholder="Password">
+
+<button onclick="register()">Register</button>
+
+<div class="link" onclick="showPage('loginPage')">
+Already have account? Login
+</div>
+
+</div>
+
+</section>
+
+<!-- MAIN PAGE -->
+
+<section id="mainPage" class="page">
+
+<nav>
+
+<h2>EMS</h2>
+
+<ul>
+<li onclick="showContent('dashboard')">Dashboard</li>
+<li onclick="showContent('crud')">Employees</li>
+<li>
+<button class="logout-btn" onclick="logout()">
+Logout
+</button>
+</li>
+</ul>
+
+</nav>
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="content">
+
+<h1>Dashboard</h1>
+
+<div class="dashboard">
+
+<div class="card">
+<h2>Total Employees</h2>
+<p id="totalEmployees">0</p>
+</div>
+
+<div class="card">
+<h2>Highest Salary</h2>
+<p id="highestSalary">0</p>
+</div>
+
+<div class="card">
+<h2>Average Salary</h2>
+<p id="averageSalary">0</p>
+</div>
+
+</div>
+
+</div>
+
+<!-- CRUD -->
+
+<div id="crud" class="content" style="display:none;">
+
+<h1>Employee Management</h1>
+
+<div class="form-container">
+
+<input type="hidden" id="employeeId">
+
+<input type="text" id="name" placeholder="Name">
+
+<input type="email" id="email" placeholder="Email">
+
+<input type="text" id="department" placeholder="Department">
+
+<input type="number" id="salary" placeholder="Salary">
+
+<button onclick="saveEmployee()">Save Employee</button>
+
+</div>
+
+<!-- FILTER -->
+
+<div class="filter-box">
+
+<input type="text"
+id="searchInput"
+placeholder="Search Employee..."
+onkeyup="filterEmployees()">
+
+</div>
+
+<!-- TABLE -->
+
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Department</th>
+<th>Salary</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="employeeTable"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<script>
+
+const EMP_API = "http://localhost:8099/employees";
+
+const AUTH_API = "http://localhost:8099/auth";
+/* PAGE */
+
+function showPage(id){
+
+    document.querySelectorAll(".page")
+    .forEach(p => p.classList.remove("active"));
+
+    document.getElementById(id)
+    .classList.add("active");
+}
+
+/* CONTENT */
+
+function showContent(id){
+
+    document.querySelectorAll(".content")
+    .forEach(c => c.style.display="none");
+
+    document.getElementById(id).style.display="block";
+}
+
+/* REGISTER */
+
+async function register(){
+
+    const user = {
+
+        username:document.getElementById("registerUsername").value,
+
+        password:document.getElementById("registerPassword").value
+    };
+
+    const response = await fetch(
+        AUTH_API + "/register",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(user)
+        }
+    );
+
+    if(response.ok){
+
+        alert("Registered Successfully");
+
+        showPage("loginPage");
+    }
+    else{
+
+        alert("Registration Failed");
+    }
+}
+
+/* LOGIN */
+
+async function login(){
+
+    const user = {
+
+        username:document.getElementById("loginUsername").value,
+
+        password:document.getElementById("loginPassword").value
+    };
+
+    const response = await fetch(
+        AUTH_API + "/login",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(user)
+        }
+    );
+
+    const data = await response.text();
+
+    if(data === "Login Success"){
+
+        alert("Login Success");
+
+        showPage("mainPage");
+
+        getEmployees();
+    }
+    else{
+
+        alert("Invalid Username or Password");
+    }
+}
+
+/* LOGOUT */
+
+function logout(){
+
+    alert("Logout Success");
+
+    showPage("loginPage");
+}
+
+/* GET EMPLOYEES */
+
+async function getEmployees(){
+
+    const res = await fetch(EMP_API);
+
+    const data = await res.json();
+
+    let rows = "";
+
+    let totalSalary = 0;
+
+    let highestSalary = 0;
+
+    data.forEach(emp => {
+
+        totalSalary += emp.salary;
+
+        if(emp.salary > highestSalary){
+
+            highestSalary = emp.salary;
+        }
+
+        rows += `
+        <tr>
+
+        <td>${emp.id}</td>
+
+        <td>${emp.name}</td>
+
+        <td>${emp.email}</td>
+
+        <td>${emp.department}</td>
+
+        <td>${emp.salary}</td>
+
+        <td>
+
+        <button class="edit-btn"
+        onclick="editEmployee(
+        ${emp.id},
+        '${emp.name}',
+        '${emp.email}',
+        '${emp.department}',
+        ${emp.salary})">
+
+        Update
+
+        </button>
+
+        <button class="delete-btn"
+        onclick="deleteEmployee(${emp.id})">
+
+        Delete
+
+        </button>
+
+        </td>
+
+        </tr>
+        `;
+    });
+
+    document.getElementById("employeeTable").innerHTML = rows;
+
+    document.getElementById("totalEmployees").innerText = data.length;
+
+    document.getElementById("highestSalary").innerText = highestSalary;
+
+    document.getElementById("averageSalary").innerText =
+    data.length ? (totalSalary/data.length).toFixed(2) : 0;
+}
+
+/* SAVE EMPLOYEE */
+
+async function saveEmployee(){
+
+    const id = document.getElementById("employeeId").value;
+
+    const employee = {
+
+        name:document.getElementById("name").value,
+
+        email:document.getElementById("email").value,
+
+        department:document.getElementById("department").value,
+
+        salary:document.getElementById("salary").value
+    };
+
+    if(id){
+
+        await fetch(EMP_API + "/" + id,{
+
+            method:"PUT",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(employee)
+        });
+
+        alert("Employee Updated");
+    }
+
+    else{
+
+        await fetch(EMP_API,{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(employee)
+        });
+
+        alert("Employee Added");
+    }
+
+    clearForm();
+
+    getEmployees();
+}
+
+/* EDIT */
+
+function editEmployee(id,name,email,department,salary){
+
+    document.getElementById("employeeId").value = id;
+
+    document.getElementById("name").value = name;
+
+    document.getElementById("email").value = email;
+
+    document.getElementById("department").value = department;
+
+    document.getElementById("salary").value = salary;
+}
+
+/* DELETE */
+
+async function deleteEmployee(id){
+
+    await fetch(EMP_API + "/" + id,{
+
+        method:"DELETE"
+    });
+
+    alert("Employee Deleted");
+
+    getEmployees();
+}
+
+/* FILTER */
+
+function filterEmployees(){
+
+    let input =
+    document.getElementById("searchInput")
+    .value.toLowerCase();
+
+    let rows =
+    document.querySelectorAll("#employeeTable tr");
+
+    rows.forEach(row => {
+
+        let text = row.innerText.toLowerCase();
+
+        if(text.includes(input)){
+
+            row.style.display = "";
+        }
+        else{
+
+            row.style.display = "none";
+        }
+    });
+}
+
+/* CLEAR FORM */
+
+function clearForm(){
+
+    document.getElementById("employeeId").value = "";
+
+    document.getElementById("name").value = "";
+
+    document.getElementById("email").value = "";
+
+    document.getElementById("department").value = "";
+
+    document.getElementById("salary").value = "";
+}
+
+</script>
+
+</body>
+</html>
